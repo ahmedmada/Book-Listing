@@ -1,6 +1,7 @@
 package com.basic.nanodegree.booklisting;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
 
     Button mSearchButton;
     TextView mInfoTextView;
@@ -43,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String BOOK_REQUEST_URL =
             "https://www.googleapis.com/books/v1/volumes?q=";
+
+    public static int index = -1;
+    public static int top = -1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +79,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    int mScrollPosition;
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        BookAsyncTask task = new BookAsyncTask();
+        task.execute();
+
+        if(index != -1)
+        {
+            mLayoutManager.scrollToPositionWithOffset( index, top);
+        }
+    }
+
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        //read current recyclerview position
+        index = mLayoutManager.findFirstVisibleItemPosition();
+        View v = mRecyclerView.getChildAt(0);
+        top = (v == null) ? 0 : (v.getTop() - mRecyclerView.getPaddingTop());
+    }
+
+
 
     private class BookAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
         private String searchInput = mSearchEditText.getText().toString();

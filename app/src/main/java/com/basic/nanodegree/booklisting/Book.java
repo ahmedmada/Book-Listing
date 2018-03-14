@@ -43,4 +43,6 @@ public class Book {
     public String getBookInfoLink() {
         return mBookInfoLink;
     }
+
+
 }
